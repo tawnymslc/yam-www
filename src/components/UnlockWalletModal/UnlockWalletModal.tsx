@@ -78,6 +78,17 @@ const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
               />
             </Box>
           </Box>
+          <Spacer />
+            <Box flex={1}>
+              <WalletProviderCard
+                icon={<img src={portisLogo} style={{ height: 24 }} />}
+                name="UnstopabbleDomains"
+                onSelect={handleConnectUD}
+              />
+            </Box>
+            <Spacer />
+            <Box flex={1}>
+            </Box>
         </StyledWalletsWrapper>
       </ModalContent>
       <ModalActions>
