@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import { Box, Button, Modal, ModalActions, ModalContent, ModalProps, ModalTitle, Spacer } from "react-neu";
 import styled from "styled-components";
 import { useWallet } from "use-wallet";
+import UAuth from '@uauth/js'
 
 import metamaskLogo from "assets/metamask-fox.svg";
 import walletConnectLogo from "assets/wallet-connect.svg";
@@ -9,6 +10,21 @@ import fortmaticLogo from "assets/fortmatic.png";
 import portisLogo from "assets/portis.png";
 
 import WalletProviderCard from "./components/WalletProviderCard";
+
+async function handleConnectUD () {
+  const uauth = new UAuth({
+    clientID: "1a46ffc7-710b-42e7-8ca9-270141cd8a1f",
+    redirectUri: "http://localhost:3000",
+    scope: "openid wallet"})
+  let authorization = null;
+  try {
+  authorization = await uauth.loginWithPopup()
+  }
+  catch (error) {
+    console.log(error);
+  }
+  return authorization;
+  }
 
 const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
   const { account, connector, connect } = useWallet();
@@ -79,16 +95,18 @@ const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
             </Box>
           </Box>
           <Spacer />
+          <Box width={'100%'} row>
             <Box flex={1}>
               <WalletProviderCard
                 icon={<img src={portisLogo} style={{ height: 24 }} />}
-                name="UnstopabbleDomains"
+                name="Unstopabble Domains"
                 onSelect={handleConnectUD}
               />
             </Box>
             <Spacer />
             <Box flex={1}>
             </Box>
+          </Box>
         </StyledWalletsWrapper>
       </ModalContent>
       <ModalActions>
