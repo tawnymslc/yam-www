@@ -2,7 +2,10 @@ import React, { useCallback, useEffect } from "react";
 import { Box, Button, Modal, ModalActions, ModalContent, ModalProps, ModalTitle, Spacer } from "react-neu";
 import styled from "styled-components";
 import { useWallet } from "use-wallet";
-import UAuth from '@uauth/js'
+
+import {useWeb3React} from '@web3-react/core'
+import {WalletConnectConnector} from '@web3-react/walletconnect-connector'
+import connectors from "../../connectors"
 
 import metamaskLogo from "assets/metamask-fox.svg";
 import walletConnectLogo from "assets/wallet-connect.svg";
@@ -11,23 +14,25 @@ import portisLogo from "assets/portis.png";
 
 import WalletProviderCard from "./components/WalletProviderCard";
 
-async function handleConnectUD () {
-  const uauth = new UAuth({
-    clientID: "1a46ffc7-710b-42e7-8ca9-270141cd8a1f",
-    redirectUri: "http://localhost:3000",
-    scope: "openid wallet"})
-  let authorization = null;
-  try {
-  authorization = await uauth.loginWithPopup()
-  }
-  catch (error) {
-    console.log(error);
-  }
-  return authorization;
-  }
-
 const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
   const { account, connector, connect } = useWallet();
+  const {activate} = useWeb3React();
+  let udAccount = false;
+
+  async function connectHandler(connectorId: string) {
+    try {
+      const udConnector = connectors[connectorId]
+      console.log(connectors);
+      if (udConnector instanceof WalletConnectConnector && udConnector.walletConnectProvider) {
+        udConnector.walletConnectProvider = undefined
+      }
+      await activate(udConnector)
+      udAccount = true;
+      localStorage.setItem("walletProvider", connectorId);
+    } catch (error) { 
+      console.error(error)
+    }
+}
 
   const handleConnectMetamask = useCallback(() => {
     connect("injected");
@@ -44,6 +49,10 @@ const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
   const handleConnectPortis = useCallback(() => {
     connect("portis");
   }, [connect]);
+
+  const handleConnectUnstoppable = useCallback(() => {
+    connectHandler("uauth");
+  }, [connectHandler]);
 
   useEffect(() => {
     if (account) {
@@ -100,7 +109,7 @@ const UnlockWalletModal: React.FC<ModalProps> = ({ isOpen, onDismiss }) => {
               <WalletProviderCard
                 icon={<img src={portisLogo} style={{ height: 24 }} />}
                 name="Unstopabble Domains"
-                onSelect={handleConnectUD}
+                onSelect={handleConnectUnstoppable}
               />
             </Box>
             <Spacer />

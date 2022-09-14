@@ -6,9 +6,20 @@ import './plugins/i18n';
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+import {Web3Provider} from '@ethersproject/providers'
+import {Web3ReactProvider} from '@web3-react/core'
+
+function getLibrary(provider: any): Web3Provider {
+  const library = new Web3Provider(provider)
+  library.pollingInterval = 12000
+  return library
+}
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <App />
+    </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
